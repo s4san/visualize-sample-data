@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Visualize Asset Allocation</title>
+    <meta charset="utf-8">
+    <style>
+
+      body {
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        margin: auto;
+        position: relative;
+        width: 960px;
+      }
+
+      text {
+        font: 10px sans-serif;
+      }
+
+      form {
+        position: absolute;
+        right: 10px;
+        top: 10px;
+      }
+
+    </style>
+  </head>
+  <body>
+    <form>
+      <label><input type="radio" name="dataset" value="assetClass" checked>Asset Class</label>
+      <label><input type="radio" name="dataset" value="geography">Geography</label>
+    </form>
+    <p>No Arc selected.</p>
+    <script src="//d3js.org/d3.v4.min.js"></script>
+    <script src="/chartAssets.js"></script>
+  </body>
+</html>
