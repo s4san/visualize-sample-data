@@ -1,14 +1,18 @@
 +function(window, d3) {
 
+  let outerArc = null;
+
   const data = [
     {assetClass: 60, geography: 40},
-    {assetClass: 30, geography: 40},
-    {assetClass: 10, geography: 20}
+    {assetClass: 30, geography: 30},
+    {assetClass: 15, geography: 2},
+    {assetClass: 15, geography: 1}
   ];
 
   const width = 960;
-  const height = 500;
-  const radius = Math.min(width, height) / 2;
+  const height = 750;
+  const min = 500;
+  const radius = Math.min(width, height, min) / 2;
 
   const color = d3.scaleOrdinal(d3.schemeCategory20);
 
@@ -36,11 +40,36 @@
     .data(pie)
     .enter()
     .append('path')
-    .attr('fill', (d, i) => color(i + 4))
+    .attr('fill', (d, i) => color(i))
     .attr('d', arc)
-    .on('mouseover', (d) => {
-      d3.select('p').text(d => `Hovering arc:\t${Math.floor(Math.random() * 10)}`);
+    .each(function(d) {
+      this.currentArc = d;
+    })
+    .on('mouseover', function(d) {
+      const currentArc = d3.select(this);
+      const newArc = d3
+        .arc()
+        .innerRadius(radius - 20)
+        .outerRadius(radius + 80)
+        .startAngle(d.startAngle)
+        .endAngle(d.endAngle);
+      
+      d3.select('svg > path').remove();
+
+      d3.select('svg')
+        .append('path')
+        .attr('fill', currentArc.attr('fill'))
+        .attr('d', newArc)
+        .attr('transform', `translate( ${width / 2}, ${height / 2} )`)
+        .on('mouseout', _ => d3.select('svg > path').remove());
+
+      currentArc.style("opacity", 0.7);
+      //d3.select('p').text(t => `Hovering arc with data: ${d.data.assetClass} ${d.data.geography}`);
+    })
+    .on('mouseout', function(d) {
+      d3.select(this).style("opacity", 1);
     });
+
   d3.selectAll('input')
     .on('change', change);
   
@@ -48,7 +77,13 @@
     const value = this.value;
     pie.value(d => d[value]);
     path = path.data(pie);
-    path.attr('d', arc);
+    path.transition().duration(750).attrTween('d', arcTween);
+  }
+
+  function arcTween(a) {
+    const i = d3.interpolate(this.currentArc, a);
+    this.currentArc = i(0);
+    return (t) => arc(i(t));
   }
 
 }(window, d3);
