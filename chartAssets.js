@@ -42,9 +42,7 @@
     .append('path')
     .attr('fill', (d, i) => color(i))
     .attr('d', arc)
-    .each(function(d) {
-      this.currentArc = d;
-    })
+    .attr('id', (d, i) => 'dataArc_' + i)
     .on('mouseover', function(d) {
       const currentArc = d3.select(this);
       const newArc = d3
@@ -69,6 +67,17 @@
     .on('mouseout', function(d) {
       d3.select(this).style("opacity", 1);
     });
+
+  svg
+    .selectAll('text')
+    .data(data)
+    .enter()
+    .append('text')
+    .attr('x', 35)
+    .attr('dy', 15)
+    .append('textPath')
+    .attr('xlink:href', (d, i) => '#dataArc_' + i)
+    .text(d => `${d.assetClass} %`)
 
   d3.selectAll('input')
     .on('change', change);
