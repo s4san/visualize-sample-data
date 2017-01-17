@@ -9,6 +9,23 @@
     {assetClass: 15, geography: 1}
   ];
 
+  const ticker = [
+    'VCR',
+    'VDC',
+    'VIG',
+    'VYM',
+    'VDE',
+    'VFH',
+    'VUG',
+    'VHT',
+    'VIS',
+    'VOO',
+    'VV',
+    'VAW',
+    'VO',
+    'VOE'
+  ];
+
   const width = 960;
   const height = 750;
   const min = 500;
@@ -45,21 +62,30 @@
     .attr('id', (d, i) => 'dataArc_' + i)
     .on('mouseover', function(d) {
       const currentArc = d3.select(this);
-      const newArc = d3
+      const startAngle = d.startAngle;
+      const endAngle = d.endAngle;
+      const arcWidth = (endAngle - startAngle) / ticker.length;
+
+      d3.selectAll('svg > path').remove();
+
+      ticker.forEach((tick, i) => {
+        const arcStart = startAngle + (i * arcWidth);
+        const arcEnd = arcStart + arcWidth;
+        const newArc = d3
         .arc()
         .innerRadius(radius - 20)
         .outerRadius(radius + 80)
-        .startAngle(d.startAngle)
-        .endAngle(d.endAngle);
-      
-      d3.select('svg > path').remove();
+        .startAngle(arcStart)
+        .endAngle(arcEnd);
 
-      d3.select('svg')
-        .append('path')
-        .attr('fill', currentArc.attr('fill'))
-        .attr('d', newArc)
-        .attr('transform', `translate( ${width / 2}, ${height / 2} )`)
-        .on('mouseout', _ => d3.select('svg > path').remove());
+        window.setTimeout(() => {
+          d3.select('svg')
+            .append('path')
+            .attr('fill', currentArc.attr('fill'))
+            .attr('d', newArc)
+            .attr('transform', `translate( ${width / 2}, ${height / 2} )`)
+        }, (i+1) * 100)
+      });
 
       currentArc.style("opacity", 0.7);
       //d3.select('p').text(t => `Hovering arc with data: ${d.data.assetClass} ${d.data.geography}`);
